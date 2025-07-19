@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Working shit",
+  "description": "Shows images and captions from visible social media posts.",
+  "version": "1.0",
+  "permissions": ["scripting", "tabs", "activeTab"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Visible Post Viewer"
+  },
+  "host_permissions": [
+    "*://*.twitter.com/*",
+    "*://*.instagram.com/*"
+  ]
+}
