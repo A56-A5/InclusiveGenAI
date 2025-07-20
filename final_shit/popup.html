@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Visible Posts</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      min-width: 300px;
+      padding: 10px;
+      background: #f9f9f9;
+    }
+    .post {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 15px;
+      background: white;
+      border-radius: 8px;
+    }
+    .caption,
+    .dims,
+    img {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h3>Visible Posts</h3>
+  <div id="posts">Loading...</div>
+  <script src="popup.js"></script>
+</body>
+</html>
