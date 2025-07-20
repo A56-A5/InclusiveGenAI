@@ -157,3 +157,9 @@ user John_wick has posted
 Caption : blah blah blah 
 Image description : .... 
 ``` 
+
+
+## Screenshots
+
+![App Screenshot](images/image.png)
+![App Screenshot](images/image2.png)
