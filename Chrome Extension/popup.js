@@ -49,12 +49,40 @@ document.addEventListener("DOMContentLoaded", () => {
                   return width > 50 && height > 50 && !img.alt?.includes("Avatar");
                 })
                 .map((img) => ({
+                  type: "image",
                   src: img.src,
                   width: img.naturalWidth,
                   height: img.naturalHeight,
                 }));
 
-              if (images.length === 0) return;
+              const gifs = images.filter((img) =>
+                img.src.endsWith(".gif") ||
+                img.src.includes("format=gif") ||
+                img.src.includes(".gif?")
+              ).map(gif => ({ ...gif, type: "gif" }));
+
+              // Remove GIFs from the image list to avoid duplication
+              const cleanImages = images.filter(img => !gifs.includes(img));
+
+              const videoPlayers = Array.from(article.querySelectorAll('[data-testid="videoPlayer"]'));
+              const videos = videoPlayers.map((container) => {
+                const video = container.querySelector("video");
+                if (!video) return null;
+                const rect = video.getBoundingClientRect();
+                if (rect.width < 100 || rect.height < 100) return null;
+                let src = video.currentSrc || video.src || (video.querySelector("source")?.src ?? "");
+                if (src.startsWith("blob:")) src = ""; // blob URLs can't be fetched or passed to AI
+
+                return {
+                  type: "video",
+                  src,
+                  width: video.videoWidth || rect.width,
+                  height: video.videoHeight || rect.height,
+                };
+              }).filter(Boolean);
+
+              const media = [...cleanImages, ...gifs, ...videos];
+              if (media.length === 0) return;
 
               let username = "";
               let caption = "";
@@ -72,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
               posts.push({
                 username: username || "[No user]",
                 caption: caption || "[No caption]",
-                images,
+                media,
               });
             });
 
@@ -103,29 +131,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
             readAloud(`Username: ${post.username} has posted: Caption: ${post.caption}`);
 
-            for (const imgData of post.images) {
-              const imgEl = document.createElement("img");
-              imgEl.src = imgData.src;
-              imgEl.alt = "Post Image";
-              imgEl.style.maxWidth = "100%";
-              postEl.appendChild(imgEl);
+            for (const mediaItem of post.media) {
+              let mediaEl;
+
+              if (mediaItem.type === "image" || mediaItem.type === "gif") {
+                mediaEl = document.createElement("img");
+                mediaEl.src = mediaItem.src;
+                mediaEl.alt = "Post Media";
+                mediaEl.style.maxWidth = "100%";
+              } else if (mediaItem.type === "video") {
+                mediaEl = document.createElement("video");
+                mediaEl.src = mediaItem.src;
+                mediaEl.controls = true;
+                mediaEl.style.maxWidth = "100%";
+              }
+
+              postEl.appendChild(mediaEl);
 
               const dims = document.createElement("div");
               dims.className = "dims";
-              dims.textContent = `🖼️ Image Dimensions: ${imgData.width}×${imgData.height}`;
+              dims.textContent = `📺 ${mediaItem.type.toUpperCase()} Dimensions: ${mediaItem.width}×${mediaItem.height}`;
               postEl.appendChild(dims);
 
               const captionEl = document.createElement("div");
               captionEl.className = "caption";
               captionEl.textContent = "🔄 Generating caption...";
               postEl.appendChild(captionEl);
-              // may add this if needed  
-              // readAloud(`Generating caption...`);
 
-              // 🧠 Fetch & speak image caption
-              fetchCaptionFromAPI(imgData.src).then((realCaption) => {
+              fetchCaptionFromAPI(mediaItem.src).then((realCaption) => {
                 captionEl.textContent = `🧠 AI Caption: ${realCaption}`;
-                readAloud(`Image details: ${realCaption}`);
+                readAloud(`Media description: ${realCaption}`);
               });
             }
 
@@ -144,14 +179,14 @@ document.addEventListener("DOMContentLoaded", () => {
     window.speechSynthesis.speak(utterance);
   }
 
-  async function fetchCaptionFromAPI(imageUrl) {
+  async function fetchCaptionFromAPI(mediaUrl) {
     try {
       const response = await fetch("http://localhost:5000/caption", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ url: imageUrl }),
+        body: JSON.stringify({ url: mediaUrl }),
       });
 
       if (!response.ok) throw new Error("API Error");

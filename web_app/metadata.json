@@ -1,0 +1,5 @@
+{
+  "name": "sensora.ai",
+  "description": "A social media feed application, similar to Instagram, where users can view posts, like, comment, and create new posts with AI-generated captions powered by Gemini.",
+  "requestFramePermissions": []
+}
