@@ -80,3 +80,80 @@ We're not just enabling access — we're enabling **emotion**. With Sensora.ai, 
 
 ---
 
+# Backend (common for webapp & extnsion)
+## Instructions to run 
+
+```bash
+git clone https://github.com/A56-A5/sensora
+cd backend
+```
+
+### Install Dependencies
+
+```bash
+pip install Flask flask-cors Pillow requests google-gerativeai
+```
+
+Replace this with your gemini api key (50 uses per day (free tier)) in api.py 
+
+```bash
+API_KEY = ""
+``` 
+
+### Run backend
+```bash
+python api.py
+```
+
+# Web App
+
+## Instructions to run 
+
+Make sure to run the backend in a split / seperate terminal 
+```bash
+cd web_app
+npm install 
+npm run dev 
+```
+
+Scrolling to each post will out a voice like 
+```bash
+user John_wick has posted 
+Caption : blah blah blah 
+Image description : .... 
+``` 
+
+Adding new post will call gemini 1.5 flash model to get a detailed image description 
+Would load faster than extensions because the api is only called during posting.
+
+# Chrome Extension 
+
+Make sure to run the backend in a split / seperate terminal 
+### Installation guide 
+
+1. Go to chrome extensions or copy this link in the browser url 
+
+```bash 
+chrome://extensions 
+```
+
+2. Enable Developer mode(top right)
+
+3. Click Load unpacked
+
+4. Select Chrome_Extension folder 
+
+5. Your extension should now appear in the Chrome toolbar 
+
+✅ Any changes you make to the code will require a manual Reload of the extension in the extensions page.
+
+Go to twitter home page and click on the extension and it should run 
+
+(Scrolling to new post should update the voice output)
+
+Voice output will be like 
+```bash
+user John_wick has posted 
+Caption : blah blah blah 
+Image description : .... 
+``` 
